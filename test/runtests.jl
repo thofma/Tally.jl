@@ -40,80 +40,83 @@ Base.hash(::A) = rand(UInt)
   @test sprint(show, "text/plain", T) isa String
   @test sprint(show, T) isa String
 
-  T = tally([2, 1, 1, 1, 1, 2, 2, 3])
-  plot1 = 
-  "     ┌                                        ┐        \n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
-  "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
-  "     └                                        ┘        "
+  # decimals are different on julia 1.0
+  if VERSION >= v"1.8"
+    T = tally([2, 1, 1, 1, 1, 2, 2, 3])
+    plot1 = 
+    "     ┌                                        ┐        \n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
+    "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
+    "     └                                        ┘        "
 
-  plot2 =
-  "     ┌                                        ┐        \n" *
-  "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
-  "     └                                        ┘        "
+    plot2 =
+    "     ┌                                        ┐        \n" *
+    "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
+    "     └                                        ┘        "
 
-  plot3 =
-  "     ┌                                        ┐        \n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
-  "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
-  "     └                                        ┘        "
+    plot3 =
+    "     ┌                                        ┐        \n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
+    "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
+    "     └                                        ┘        "
 
-  plot4 =
-  "     ┌                                        ┐        \n" *
-  "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
-  "     └                                        ┘        "
+    plot4 =
+    "     ┌                                        ┐        \n" *
+    "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
+    "     └                                        ┘        "
 
-  plot5 = 
-  "     ┌                                        ┐        \n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
-  "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
-  "     └                                        ┘        "
-  
-  plot6 =
-  "     ┌                                        ┐ \n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   \n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            \n" *
-  "   3 ┤■■■■■■■■■ 1                               \n" *
-  "     └                                        ┘ "
+    plot5 = 
+    "     ┌                                        ┐        \n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
+    "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
+    "     └                                        ┘        "
+    
+    plot6 =
+    "     ┌                                        ┐ \n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   \n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            \n" *
+    "   3 ┤■■■■■■■■■ 1                               \n" *
+    "     └                                        ┘ "
 
-  plot7 = 
-  "                        Tally                          \n" *
-  "     ┌                                        ┐        \n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
-  "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
-  "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
-  "     └                                        ┘        "
-  @test string(Tally.plot(T)) == plot1
-  @test string(Tally.plot(T, sortby = :value)) == plot1
-  @test string(Tally.plot(T, sortby = :key)) == plot2
-  @test string(Tally.plot(T, sortby = :key, reverse = true)) == plot1
-  @test string(Tally.plot(T, sortby = :value, reverse = true)) == plot2
-  @test string(Tally.plot(T, sortby = x -> sin(x))) == plot3
-  @test string(Tally.plot(T, sortby = x -> sin(x), reverse = true)) == plot4
-  @test string(Tally.plot(T, percentage = false)) == plot6
-  @test string(Tally.plot(T, title = "Tally")) == plot7
+    plot7 = 
+    "                        Tally                          \n" *
+    "     ┌                                        ┐        \n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 4   0.50  %\n" *
+    "   2 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 3            0.38  %\n" *
+    "   3 ┤■■■■■■■■■ 1                               0.12  %\n" *
+    "     └                                        ┘        "
 
-  @test bar(T) isa Plots.Plot
+    plot8 =
+    "     ┌                                        ┐          \n" *
+    "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 10 000   0.9999  %\n" *
+    "   2 ┤ 1                                        0.0001  %\n" *
+    "     └                                        ┘          "
 
-  # Distorted percentages
+    @test string(Tally.plot(T)) == plot1
+    @test string(Tally.plot(T, sortby = :value)) == plot1
+    @test string(Tally.plot(T, sortby = :key)) == plot2
+    @test string(Tally.plot(T, sortby = :key, reverse = true)) == plot1
+    @test string(Tally.plot(T, sortby = :value, reverse = true)) == plot2
+    @test string(Tally.plot(T, sortby = x -> sin(x))) == plot3
+    @test string(Tally.plot(T, sortby = x -> sin(x), reverse = true)) == plot4
+    @test string(Tally.plot(T, percentage = false)) == plot6
+    @test string(Tally.plot(T, title = "Tally")) == plot7
 
-  T = tally(push!([1 for i in 1:10000], 2))
-  @test T.data == [(1 => 10000), (2 => 1)]
+    @test bar(T) isa Plots.Plot
 
-  plot8 =
-  "     ┌                                        ┐          \n" *
-  "   1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 10 000   0.9999  %\n" *
-  "   2 ┤ 1                                        0.0001  %\n" *
-  "     └                                        ┘          "
+    # Distorted percentages
 
-  @test string(Tally.plot(T)) == plot8
+    T = tally(push!([1 for i in 1:10000], 2))
+    @test T.data == [(1 => 10000), (2 => 1)]
+    @test string(Tally.plot(T)) == plot8
+  end
 
   # Iteration and pushing
 
