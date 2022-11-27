@@ -94,9 +94,10 @@ function _tally_dict(it)
 end
 
 """
-    tally(it; kw...)
+    tally(data; kw...)
 
-Construct a tally by considering all elements of `it`.
+Construct a tally by considering all elements of `data`, which can be any
+iteratable object.
 
 # Keyword arguments
 - `by`: By default, elements are compared using `isequal`. This can be overwritten by setting `by = f` for any 2-adic boolean function `f`.
@@ -107,16 +108,16 @@ Construct a tally by considering all elements of `it`.
 ```jldoctest
 julia> T = tally([1, 1, 1, -1, -1, 2, 2, 3])
 Tally with 8 items in 4 groups:
-1  | 3 | 0.38  %
-2  | 2 | 0.25  %
--1 | 2 | 0.25  %
-3  | 1 | 0.12  %
+1  | 3 | 0.38%
+2  | 2 | 0.25%
+-1 | 2 | 0.25%
+3  | 1 | 0.12%
 
 julia> T = tally([1, 1, 1, -1, -1, 2, 2, 3], by = (x, y) -> abs(x) == abs(y))
 Tally with 8 items in 3 groups:
-1 | 5 | 0.62  %
-2 | 2 | 0.25  %
-3 | 1 | 0.12  %
+1 | 5 | 0.62%
+2 | 2 | 0.25%
+3 | 1 | 0.12%
 """
 function tally(it; by = isequal, use_hash::Bool = true)
   if by === isequal && use_hash
@@ -158,7 +159,7 @@ function _get_nice_percentages(per::Vector{Float64})
       find_ndigits += 1
     end
   end
-  return find_ndigits, [sprint_formatted("%.$(find_ndigits)f ", p) * " %" for p in per]
+  return find_ndigits, [sprint_formatted("%.$(find_ndigits)f", p)* "%" for p in per]
 end
 
 # Print it as a table
