@@ -3,6 +3,14 @@ using Test
 
 using Plots
 
+# type with bad hashing
+
+struct A
+  x::Int
+end
+
+Base.hash(::A) = rand(UInt)
+
 @testset "Tally.jl" begin
   for use_hash in [true, false]
     T = tally([1, 1, 1], use_hash = use_hash)
@@ -18,13 +26,6 @@ using Plots
     @test T.data == [(1 => 5), (2 => 3)]
   end
 
-  # type with bad hashing
-
-  struct A
-    x::Int
-  end
-
-  Base.hash(::A) = rand(UInt)
 
   T = tally([A(1), A(1), A(2)], use_hash = false)
   @test T.data == [A(1) => 2, A(2) => 1]
@@ -33,6 +34,11 @@ using Plots
   @test T.data == [A(1) => 3]
 
   # unicode plotting
+
+  T = tally([2, 1, 1, 1, 1, 2, 2, 3])
+
+  @test sprint(show, "text/plain", T) isa String
+  @test sprint(show, T) isa String
 
   T = tally([2, 1, 1, 1, 1, 2, 2, 3])
   plot1 = 
