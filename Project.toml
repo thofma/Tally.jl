@@ -3,11 +3,17 @@ uuid = "4a7475b6-8451-4f36-8c0c-176e4d128198"
 authors = ["Tommy Hofmann <thofma@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
+
 [compat]
 julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [targets]
-test = ["Test"]
+test = ["Test", "Plots"]
