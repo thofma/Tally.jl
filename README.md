@@ -32,7 +32,7 @@ Tally with 4 items in 2 groups:
 One can put in any iteratable object
 
 ```julia
-julia> T = tally(rand(-1:1, 10, 10)) # a random 10x10 matrix with entries in [-1, 1]
+julia> T = tally(rand(-1:1, 10, 10)) # a random 10x10 matrix with entries in [-1, 0, 1]
 Tally with 100 items in 3 groups:
 -1 | 37 | 0.37%
 0  | 36 | 0.36%
