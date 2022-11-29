@@ -80,29 +80,52 @@ See `?Plots.bar` for more information on how to customize this plot.
 
 ## Advanced usage
 
-### Types without consistent hashes
+### Tally is too slow
 
-Per default, Tally.jl will use a dictionary to do the counting. For types that (for whatever reasons) do not come with a consistent `hash` implentation, one can disable the use of a dictionary using the keyword argument `use_hash = false`.
+To work also for objects, for which a consistent hash is not implemented, Tally does not use `hash` by default. This can be enabled using the `use_hash = true` keyword.
 
 ```julia
-julia> struct A
-         x::Int
-       end
+julia> v = [rand([[1], [2]]) for i in 1:100000];
 
-julia> Base.hash(::A) = rand(UInt)
+julia> @btime tally($v)
+  14.563 ms (100005 allocations: 1.53 MiB)
+Tally with 100000 items in 2 groups:
+[2] | 50145 | 0.50%
+[1] | 49855 | 0.50%
 
-julia> T = tally([A(1), A(1), A(2)]) # this is nonsense
-Tally with 2 items in 3 groups:
-A(2) | 1 | 0.50%
-A(1) | 1 | 0.50%
-A(1) | 0 | 0.00%
-
-julia> T = tally([A(1), A(1), A(2)], use_hash = false)
-Tally with 3 items in 2 groups:
-A(1) | 2 | 0.67%
-A(2) | 1 | 0.33%
+julia> @btime tally($v, use_hash = true)
+  2.183 ms (7 allocations: 720 bytes)
+Tally with 100000 items in 2 groups:
+[2] | 50145 | 0.50%
+[1] | 49855 | 0.50%
 ```
 
-### Counting up to an equivalence
+### Advanced counting
 
-In 
+When counting, sometimes one wants to only do a tally with respect to some other invariant or with respect to a relation different from `==`. For this task Tally provides the `by` and `equivalence` keyword arguments. Tally will consider two elements `x, y` from the collection equal when counting, whenever `equivalence(by(x), by(y))` is `true`. The default values are `by = identity` and `equivalence = isequal`. If `equivalence` does not define an equivalence relation, the result will be useless. The optional `equivalence` argument is important in case the equivalence relation under consideration does not admit easily computable unique representatives.
+
+Note that to indicate that the counting is non-standard, Tally will print the objects within squarebrakets `[ ]`. 
+
+```julia
+julia> v = 1:100000;
+
+julia> tally(v, by = iseven)
+Tally with 100000 items in 2 groups:
+[2] | 50000 | 0.50%
+[1] | 50000 | 0.50%
+
+julia> tally(v, by = x -> mod(x, 3))
+Tally with 100000 items in 3 groups:
+[1] | 33334 | 0.33%
+[3] | 33333 | 0.33%
+[2] | 33333 | 0.33%
+
+julia> v = ["abb", "ba", "aa", "ba", "bbba", "aaab"];
+
+julia> tally(v, equivalence = (x, y) -> first(x) == first(y) && last(x) == last(y))
+Tally with 6 items in 3 groups:
+[ba]  | 3 | 0.50%
+[abb] | 2 | 0.33%
+[aa]  | 1 | 0.17%
+```
+
