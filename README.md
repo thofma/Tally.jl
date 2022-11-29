@@ -118,7 +118,7 @@ Tally with 100000 items in 2 groups:
 
 ### Counting up to an equivalence
 
-When counting, sometimes one wants to only do a tally with respect to some other invariant or with respect to a relation different from `==`. For this task Tally provides the `by` and `equivalence` keyword arguments. Tally will consider two elements `x, y` from the collection equal when counting, whenever `equivalence(by(x), by(y))` is `true`. The default values are `by = identity` and `equivalence = isequal`. If `equivalence` does not define an equivalence relation, the result will be useless. The optional `equivalence` argument is important in case the equivalence relation under consideration does not admit easily computable unique representatives.
+When counting, sometimes one wants to do a tally only with respect to some other invariant or with respect to a relation different from `==`. For this task Tally provides the `by` and `equivalence` keyword arguments. Tally will consider two elements `x, y` from the input collection equal when counting, whenever `equivalence(by(x), by(y))` is `true`. The default values are `by = identity` and `equivalence = isequal`. If `equivalence` does not define an equivalence relation, the result will be nonsense. The optional `equivalence` argument is important in case the equivalence relation under consideration does not admit easily computable unique representatives.
 
 Note that to indicate that the counting is non-standard, Tally will print the objects within squarebrakets `[ ]`. 
 
