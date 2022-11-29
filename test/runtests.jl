@@ -56,6 +56,14 @@ Base.hash(::A) = rand(UInt)
   @test sprint(show, "text/plain", T) isa String
   @test sprint(show, T) isa String
 
+  T = tally([2, 1, 1, 1, 1, 2, 2, 3], by = x -> x^2)
+  s = sprint(show, "text/plain", T)
+  @test occursin("[1]", s)
+
+  T = tally([2, 1, 1, 1, 1, 2, 2, 3], equivalence = (x, y) -> x == y)
+  s = sprint(show, "text/plain", T)
+  @test occursin("[1]", s)
+
   # decimals are different on julia 1.0
   if VERSION >= v"1.8"
     T = tally([2, 1, 1, 1, 1, 2, 2, 3])
