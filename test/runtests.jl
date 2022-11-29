@@ -36,6 +36,12 @@ Base.hash(::A) = rand(UInt)
     @test T.data == [(1 => 5), (2 => 3)]
   end
 
+  # Test the bad type paths
+  T = tally((x^2 for x in -1:1 if x > -100))
+  @test T.data == Pair{Any, Int64}[1 => 2, 0 => 1]
+
+  T = tally((x^2 for x in -1:1 if x > -100), use_hash = true)
+  @test T.data == Pair{Any, Int64}[1 => 2, 0 => 1]
 
   T = tally([A(1), A(1), A(2)])
   @test T.data == [A(1) => 2, A(2) => 1]
