@@ -145,7 +145,7 @@ Tally with 6 items in 3 groups:
 [aa]  | 1 | 0.17%
 ```
 
-Here is a more realistic example using `Hecke.jl`. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
+Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `isequivalence` functionality. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
 ```
 julia> using Hecke;
 
