@@ -68,19 +68,10 @@ function _tally_generic(it::T, by, equivalence) where {T}
     D = Vector{Pair{S, Int}}()
   else
     # do whatever you wan
-    D = Vector()
+    D = Vector{Pair{Any, Int}}()
   end
   t = TallyT(D, by, equivalence)
   append!(t, it)
-  #for x in it
-  #  fl, j = _has_key(x, D, by)
-  #  if fl
-  #    D[j] = (D[j][1] => D[j][2] + 1)
-  #  else
-  #    push!(D, (x => 1))
-  #  end
-  #end
-  #return TallyT(D, by)
   return t
 end
 
@@ -164,9 +155,7 @@ end
 function _get_nice_percentages(per::Vector{Float64})
   find_ndigits = 2
   for p in per
-    if iszero(p)
-      continue
-    end
+    iszero(p) && continue
     while all(x -> isequal(x, '0') || isequal(x, '.'), sprint_formatted("%.$(find_ndigits)f", p))
       find_ndigits += 1
     end
@@ -222,9 +211,6 @@ end
 @inline Base.iterate(T::TallyT) = iterate(T.data)
 
 @inline function Base.iterate(T::TallyT, st)
-  if st === nothing
-    return nothing
-  end
   x = Base.iterate(T.data, st)
   return (x === nothing ? nothing : x)
 end
@@ -247,6 +233,7 @@ end
 function Base.push!(T::TallyT, x)
   _push!(T, x)
   sort!(T.data, by = x -> x[2], rev = true)
+  return T
 end
 
 function Base.append!(T::TallyT, it)
@@ -254,6 +241,7 @@ function Base.append!(T::TallyT, it)
     _push!(T, x)
   end
   sort!(T.data, by = x -> x[2], rev = true)
+  return T
 end
 
 ################################################################################
