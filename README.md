@@ -1,6 +1,6 @@
 # Tally.jl
 
-*When all you need is just a tally.*
+*When all you want is to tally.*
 
 ## Status
 
