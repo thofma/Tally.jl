@@ -1,6 +1,10 @@
-# Tally.jl
+![Tally.jl](https://user-images.githubusercontent.com/11231648/204642510-9b255881-6e75-4a78-8eac-b2d77710af18.svg)
 
-*When all you want is to tally.*
+---
+
+*When all you want is to just tally.*
+
+---
 
 ## Status
 
