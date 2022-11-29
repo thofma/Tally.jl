@@ -41,6 +41,20 @@ Tally with 100 items in 3 groups:
 1  | 27 | 0.27%
 ```
 
+A tally can be extended by adding more items via `push!` or `append!`.
+
+```julia
+julia> push!(T, "x")
+Tally with 5 items in 2 groups:
+x | 4 | 0.80%
+y | 1 | 0.20%
+
+julia> append!(T, ["x", "y", "y"])
+Tally with 8 items in 2 groups:
+x | 5 | 0.62%
+y | 3 | 0.38%
+```
+
 ### Plotting a tally
 
 Tally.jl comes with some basic plotting functionalities to plot tallies within the julia REPL:
