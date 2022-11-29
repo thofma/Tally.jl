@@ -29,15 +29,18 @@ Base.hash(::A) = rand(UInt)
     T = tally([2, 1, -1, 1, -2, 1, -1, 2, 2, 1], use_hash = use_hash)
     @test T.data == [(1 => 4), (2 => 3), (-1 => 2), (-2 => 1)]
 
-    T = tally([2, 1, -1, 1, -2, 1, -1, 2], by = (x, y) -> abs(x) == abs(y), use_hash = use_hash)
+    T = tally([2, 1, -1, 1, -2, 1, -1, 2], equivalence = (x, y) -> abs(x) == abs(y), use_hash = use_hash)
+    @test T.data == [(1 => 5), (2 => 3)]
+
+    T = tally([2, 1, -1, 1, -2, 1, -1, 2], by = abs, use_hash = use_hash)
     @test T.data == [(1 => 5), (2 => 3)]
   end
 
 
-  T = tally([A(1), A(1), A(2)], use_hash = false)
+  T = tally([A(1), A(1), A(2)])
   @test T.data == [A(1) => 2, A(2) => 1]
 
-  T = tally([A(1), A(1), A(2)], use_hash = false, by = (x, y) -> true)
+  T = tally([A(1), A(1), A(2)], equivalence = (x, y) -> true)
   @test T.data == [A(1) => 3]
 
   # unicode plotting
@@ -137,7 +140,7 @@ Base.hash(::A) = rand(UInt)
   append!(T, [2, 1, 2, 2])
   @test T.data == [(2 => 5), (1 => 4)]
 
-  T = tally([-1, 1, 2, 1, -1], by = (x, y) -> abs(x) == abs(y))
+  T = tally([-1, 1, 2, 1, -1], equivalence = (x, y) -> abs(x) == abs(y))
   @test T.data == [(-1 => 4), (2 => 1)]
   push!(T, -2)
   @test T.data == [(-1 => 4), (2 => 2)]

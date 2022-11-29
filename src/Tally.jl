@@ -18,15 +18,16 @@ export tally
 mutable struct TallyT{T}
   data::Vector{Pair{T, Int}}
   by
+  equivalence
 
   function TallyT(data::Vector{Pair{T, Int}}) where {T}
     sort!(data, by = x -> x[2], rev = true)
-    return new{T}(data, isequal)
+    return new{T}(data, identity, isequal)
   end
 
-  function TallyT(data::Vector{Pair{T, Int}}, by) where {T}
+  function TallyT(data::Vector{Pair{T, Int}}, by, equivalence) where {T}
     sort!(data, by = x -> x[2], rev = true)
-    return new{T}(data, by)
+    return new{T}(data, by, equivalence)
   end
 end
 
@@ -47,9 +48,9 @@ function _create_dict(it::T) where {T}
 end
 
 # D is a Vector{<:Pair} 
-function _has_key(x, D::Vector, by)
+function _has_key(x, D::Vector, by, equivalence)
   i = findfirst(D) do y
-    return by(x, y[1])
+    return equivalence(by(x), by(y[1]))
   end
   if i !== nothing
     return true, i
@@ -60,7 +61,7 @@ end
 
 # For when we cannot or don't want to go via
 # dictionaries
-function _tally_generic(it::T, by) where {T}
+function _tally_generic(it::T, by, equivalence) where {T}
   if Base.IteratorEltype(it) == Base.HasEltype()
     # if it has an element type, use it
     S = eltype(T)
@@ -69,7 +70,7 @@ function _tally_generic(it::T, by) where {T}
     # do whatever you wan
     D = Vector()
   end
-  t = TallyT(D, by)
+  t = TallyT(D, by, equivalence)
   append!(t, it)
   #for x in it
   #  fl, j = _has_key(x, D, by)
@@ -100,8 +101,9 @@ Construct a tally by considering all elements of `data`, which can be any
 iteratable object.
 
 # Keyword arguments
-- `by`: By default, elements are compared using `isequal`. This can be overwritten by setting `by = f` for any 2-adic boolean function `f`.
-- `use_hash`: Disable the use of hashing. Use `use_hash = false` if `hash` and `isequal` are not compatible.
+- `by`: By default, elements themselves are compared when doing the counting. If `by = f` is provided, than the elements `(f(k) for k in it)` will be counted.
+- `equivalence`: By default, elements are compared using the `isequal` function. This can be overwritten by providing a 2-ary boolean function `equivalence`.
+- `use_hash`: Enable the use of hashing. This assumes that the elements that are counted have a consistent `hash` implementation. Use this if you want the function to go faster.
 
 # Examples
 
@@ -113,17 +115,24 @@ Tally with 8 items in 4 groups:
 -1 | 2 | 0.25%
 3  | 1 | 0.12%
 
-julia> T = tally([1, 1, 1, -1, -1, 2, 2, 3], by = (x, y) -> abs(x) == abs(y))
+julia> T = tally([1, 1, 1, -1, -1, 2, 2, 3], by = abs)
 Tally with 8 items in 3 groups:
-1 | 5 | 0.62%
-2 | 2 | 0.25%
-3 | 1 | 0.12%
+[1] | 5 | 0.62%
+[2] | 2 | 0.25%
+[3] | 1 | 0.12%
+
+julia> T = tally([1, 1, 1, -1, -1, 2, 2, 3], equivalence = (x, y) -> x^2 == y^2)
+
+Tally with 8 items in 3 groups:
+[1] | 5 | 0.62%
+[2] | 2 | 0.25%
+[3] | 1 | 0.12%
 """
-function tally(it; by = isequal, use_hash::Bool = true)
-  if by === isequal && use_hash
+function tally(it; by = identity, equivalence = isequal, use_hash::Bool = false)
+  if by === identity && equivalence === isequal && use_hash
     return _tally_dict(it)
   else
-    return _tally_generic(it, by)
+    return _tally_generic(it, by, equivalence)
   end
 end
 
@@ -142,11 +151,11 @@ sprint_formatted(fmt, args...) = @eval @sprintf($fmt, $(args...))
 # Pair{Any, Any}(1, 2)
 _print_pair(io, x) = print(io, x[1], " => ", x[2])
 
-function _maximal_length_of_items(T::TallyT)
+function _maximal_length_of_items(keys, vals)
   cnt_name = 0
   cnt_digits = 0
-  for x in T.data
-    cnt_name = max(cnt_name, length(sprint(show, x[1])))
+  for x in zip(keys, vals)
+    cnt_name = max(cnt_name, length((x[1])))
     cnt_digits = max(cnt_digits, ndigits(x[2]))
   end
   return cnt_name, cnt_digits
@@ -155,6 +164,9 @@ end
 function _get_nice_percentages(per::Vector{Float64})
   find_ndigits = 2
   for p in per
+    if iszero(p)
+      continue
+    end
     while all(x -> isequal(x, '0') || isequal(x, '.'), sprint_formatted("%.$(find_ndigits)f", p))
       find_ndigits += 1
     end
@@ -168,7 +180,7 @@ function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
   n = mapreduce(x -> x[2], +, T.data)
   k, v = _prepare_for_plot(T)
   print(io, "Tally with $n items in $(length(T.data)) groups:\n")
-  l_names, l_digits = _maximal_length_of_items(T)
+  l_names, l_digits = _maximal_length_of_items(k, v)
   percentages = [x/n for x in v]
   find_ndigits, percentage_strings = _get_nice_percentages(percentages)
   for (i, x) in enumerate(zip(k, v))
@@ -177,7 +189,7 @@ function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
     else
       println(io)
     end
-    print(io, rpad(sprint(show, x[1]), l_names))
+    print(io, rpad(x[1], l_names))
     print(io, " | ")
     print(io, lpad(sprint(show, x[2]), l_digits))
     print(io, " | ")
@@ -223,7 +235,7 @@ Base.length(T::TallyT) = length(T.data)
 
 function _push!(T::TallyT, x)
   D = T.data
-  fl, j = _has_key(x, D, T.by)
+  fl, j = _has_key(x, D, T.by, T.equivalence)
   if fl
     D[j] = (D[j][1] => D[j][2] + 1)
   else
@@ -254,11 +266,11 @@ end
 function _pad_the_labels(keys)
   l = 0
   for k in keys
-    l = max(l, length(string(k)))
+    l = max(l, length(k))
   end
   res = []
   for k in keys
-    push!(res, rpad(string(k), l))
+    push!(res, rpad(k, l))
   end
   return res
 end
@@ -298,6 +310,13 @@ function _prepare_for_plot(T::TallyT; sortby = :value, reverse = false, title = 
     reverse!(vals)
     reverse!(percentage)
   end
+
+  if T.by !== identity || T.equivalence !== isequal
+    keys = ["[" * string(k) * "]" for k in keys]
+  else
+    keys = [string(k) for k in keys]
+  end
+
   return keys, vals, percentage
 end
 
