@@ -146,7 +146,8 @@ Tally with 6 items in 3 groups:
 ```
 
 Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `equivalence` functionality. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
-```
+
+```julia
 julia> using Hecke;
 
 julia> ds = Hecke.squarefree_up_to(1000);
@@ -168,4 +169,5 @@ julia> Tally.plot(T)
    [GrpAb: Z/32]          ┤■■ 7                                      0.012%
    [GrpAb: Z/2 x Z/16]    ┤■ 5                                       0.008%
    [GrpAb: (Z/2)^2 x Z/8] ┤ 1                                        0.002%
+                          └                                        ┘
 ```
