@@ -169,3 +169,28 @@ julia> Tally.plot(T)
    [GrpAb: Z/2 x Z/16]    ┤■ 5                                       0.008%
    [GrpAb: (Z/2)^2 x Z/8] ┤ 1                                        0.002%
 ```
+
+Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `isequivalence` functionality. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
+```
+julia> using Hecke;
+
+julia> ds = Hecke.squarefree_up_to(1000);
+
+julia> T = tally((class_group(quadratic_field(-d)[1])[1] for d in ds), equivalence = (G, H) -> is_isomorphic(psylow_subgroup(G, 2)[1], psylow_subgroup(H, 2)[1])[1]);
+
+julia> Tally.plot(T)
+                          ┌                                        ┐
+   [GrpAb: Z/2]           ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 148   0.243%
+   [GrpAb: (Z/2)^2]       ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 122         0.201%
+   [GrpAb: Z/1]           ┤■■■■■■■■■■■■■■■■■■■■■ 89                  0.146%
+   [GrpAb: Z/4]           ┤■■■■■■■■■■■■■■■ 64                        0.105%
+   [GrpAb: Z/2 x Z/4]     ┤■■■■■■■■■■■ 48                            0.079%
+   [GrpAb: Z/8]           ┤■■■■■■■■■ 39                              0.064%
+   [GrpAb: Z/2 x Z/8]     ┤■■■■■■■■ 35                               0.058%
+   [GrpAb: (Z/2)^3]       ┤■■■■ 19                                   0.031%
+   [GrpAb: (Z/2)^2 x Z/4] ┤■■■■ 18                                   0.030%
+   [GrpAb: Z/16]          ┤■■■ 13                                    0.021%
+   [GrpAb: Z/32]          ┤■■ 7                                      0.012%
+   [GrpAb: Z/2 x Z/16]    ┤■ 5                                       0.008%
+   [GrpAb: (Z/2)^2 x Z/8] ┤ 1                                        0.002%
+```
