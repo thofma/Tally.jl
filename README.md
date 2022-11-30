@@ -1,4 +1,4 @@
-![Tally.jl](https://user-images.githubusercontent.com/11231648/204642510-9b255881-6e75-4a78-8eac-b2d77710af18.svg)
+![Tally.jl](https://user-images.githubusercontent.com/11231648/204838569-4ad7afcc-5d08-47b4-ac30-3d8d16e975ca.svg)
 
 ---
 
