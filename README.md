@@ -22,7 +22,7 @@ julia> using Pkg; Pkg.install("Tally")
 
 ### Creating a tally (frequency count)
 
-Given some data stored in an object `data`, one can count the number of occurences of items by calling `tally(data)`:
+Given some data stored in an object `data`, one can count the number of occurrences of items by calling `tally(data)`:
 
 ```julia
 julia> T = tally(["x", "x", "y", "x"])
@@ -31,7 +31,7 @@ Tally with 4 items in 2 groups:
 "y" | 1 | 0.25%
 ```
 
-One can put in any iteratable object
+One can put in any iterable object
 
 ```julia
 julia> T = tally(rand(-1:1, 10, 10)) # a random 10x10 matrix with entries in [-1, 0, 1]
@@ -145,7 +145,7 @@ Tally with 6 items in 3 groups:
 [aa]  | 1 | 0.17%
 ```
 
-Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `isequivalence` functionality. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
+Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `equivalence` functionality. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
 ```
 julia> using Hecke;
 
