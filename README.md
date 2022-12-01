@@ -171,3 +171,11 @@ julia> Tally.plot(T)
    [GrpAb: (Z/2)^2 x Z/8] ┤ 1                                        0.002%
                           └                                        ┘
 ```
+
+### Lazy tallys and animations
+
+For maximal showoff potential, one can also construct "lazy" tallies, which can be plotted
+as an animation.
+
+```julia
+

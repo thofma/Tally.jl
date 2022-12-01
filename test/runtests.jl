@@ -49,7 +49,6 @@ Base.hash(::A) = rand(UInt)
   T = tally([A(1), A(1), A(2)], equivalence = (x, y) -> true)
   @test T.data == [A(1) => 3]
 
-  # unicode plotting
 
   T = tally([2, 1, 1, 1, 1, 2, 2, 3])
 
@@ -64,6 +63,12 @@ Base.hash(::A) = rand(UInt)
   s = sprint(show, "text/plain", T)
   @test occursin("[1]", s)
 
+  T = tally(Int[])
+  @test sprint(show, "text/plain", T) isa String
+  @test sprint(show, T) isa String
+
+  # unicode plotting
+ 
   # decimals are different on julia 1.0
   if VERSION >= v"1.8"
     T = tally([2, 1, 1, 1, 1, 2, 2, 3])
@@ -160,4 +165,12 @@ Base.hash(::A) = rand(UInt)
   @test T.data == [(-1 => 4), (2 => 2)]
   append!(T, [2, -2, 2])
   @test T.data == [(2 => 5), (-1 => 4)]
+
+  # lazy tally
+  T = lazy_tally((rand(-1:1) for i in 1:100))
+  Tally.animate(T, delay = 0.001, badges = 10)
+  println()
+  @test sprint(show, "text/plain", T) isa String
+  @test sprint(show, T) isa String
+  @test  materialize(T) isa Tally.TallyT
 end
