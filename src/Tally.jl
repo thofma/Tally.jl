@@ -6,8 +6,7 @@ import UnicodePlots: barplot, label!
 
 import RecipesBase
 
-export tally
-
+export tally, lazy_tally, materialize
 
 ################################################################################
 #
@@ -29,6 +28,14 @@ mutable struct TallyT{T}
     sort!(data, by = x -> x[2], rev = true)
     return new{T}(data, by, equivalence)
   end
+end
+
+mutable struct LazyTallyT{T}
+  it::T
+  by
+  equivalence
+
+  LazyTallyT(it::T, by, equivalence) where {T} = new{T}(it, by, equivalence)
 end
 
 ################################################################################
@@ -127,6 +134,24 @@ function tally(it; by = identity, equivalence = isequal, use_hash::Bool = false)
   end
 end
 
+"""
+    lazy_tally(it; kw...)
+
+Turns the iterable object `it` into a lazy tally. The only purpose is to feed
+it to the `animate` function.
+
+It can be materialized into a proper tally by calling `materialize`.
+
+For the keyword arguments see `tally`.
+"""
+lazy_tally(it; by = identity, equivalence = isequal) = LazyTallyT(it, identity, equivalence)
+
+function materialize(T::LazyTallyT)
+  _T = TallyT(Vector{Pair{Any, Int}}(), T.by, T.equivalence)
+  append!(_T, T.it)
+  return _T
+end
+
 ################################################################################
 #
 #  Printing
@@ -134,7 +159,7 @@ end
 ################################################################################
 
 # a helper
-# sorry
+# I'm sorry
 sprint_formatted(fmt, args...) = @eval @sprintf($fmt, $(args...))
 
 # print pairs with Any nicer, because the following is nonsense
@@ -166,7 +191,7 @@ end
 # Print it as a table
 function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
   first = true
-  n = mapreduce(x -> x[2], +, T.data)
+  n = mapreduce(x -> x[2], +, T.data, init = 0)
   k, v = _prepare_for_plot(T)
   print(io, "Tally with $n items in $(length(T.data)) groups:\n")
   l_names, l_digits = _maximal_length_of_items(k, v)
@@ -200,6 +225,10 @@ function Base.show(io::IO, T::TallyT)
     end
   end
   print(io, ")")
+end
+
+function Base.show(io::IO, T::LazyTallyT)
+  print(io, "Lazy tally")
 end
 
 ################################################################################
@@ -268,12 +297,16 @@ function _prepare_for_plot(T::TallyT; sortby = :value, reverse = false, title = 
   keys = []
   vals = Int[]
   percentage = Float64[]
-  n = mapreduce(x -> x[2], +, T.data)
+  n = mapreduce(x -> x[2], +, T.data, init = 0)
   for x in T
     push!(keys, x[1])
     push!(vals, x[2])
     push!(percentage, x[2]/n)
   end
+  if isempty(T)
+    return keys, vals, percentage
+  end
+
   KT = typeof(keys[1])
   KV = typeof(vals[1])
   if sortby === :key && hasmethod(isless, (KT, KT))
@@ -314,8 +347,10 @@ end
 Plot the tally `T` using unicode plots.
 
 # Keyword arguments
-- `sortby`: If `sortby = :key`, the data will be sorted by the keys and similar for `sortby = :value`. If `sortby` is anything else, keys will be sorted via the `sort` function with `by = sortby` argument.
-- `percentage::Bool`: Display percentages or not.
+- `sortby`: If `sortby = :key`, the data will be sorted by the keys and similar
+  for `sortby = :value`. If `sortby` is anything else, keys will be sorted via
+  the `sort` function with `by = sortby` argument.  - `percentage::Bool`: Display
+  percentages or not.
 - `reverse::Bool`: Reverse the order.
 - `title::String`: A title for the plot.
 """
@@ -335,5 +370,32 @@ function plot(T::TallyT; sortby = :value, percentage = true, reverse = false, ti
 end
 
 RecipesBase.@recipe f(::Type{Tally.TallyT{S}}, T::Tally.TallyT{S}) where {S} = begin x, y = Tally._prepare_for_plot(T); return collect(zip(string.(x), y)) end
+
+# dynamic plot
+
+function _dynamic_plot(it, by, equivalence; sortby = :value, percentage = true, reverse = false, title = "", delay = 0.1, badges = 1)
+  _T = TallyT(Vector{Pair{Any, Int}}(), by, equivalence)
+  for (i, x) in enumerate(it)
+    push!(_T, x)
+    print("\033[2J")
+    print("\033[H")
+    if i % badges == 0
+      print(plot(_T, sortby = sortby, percentage = percentage, reverse = reverse, title = title))
+    #println("\033[2J")
+      sleep(delay)
+    end
+  end
+end
+
+"""
+    animate(T::LazyTally; badges = 1, delay = 0.1, kw...)
+
+Plots the lazy tally continously by adding `badges` many elements after each
+plot with a delay of `delay` seconds between the plots. The other keyword
+arguments are as for `Tally.plot`.
+"""
+function animate(T::LazyTallyT; sortby = :value, percentage = true, reverse = false, title = "", delay = 0.1, badges = 1)
+  return _dynamic_plot(T.it, T.by, T.equivalence, delay = delay, badges = badges, title = title)
+end
 
 end
