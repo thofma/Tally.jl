@@ -11,6 +11,18 @@
 [![Build Status](https://github.com/thofma/Tally.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/thofma/Tally.jl/actions/workflows/CI.yml?query=branch%3Amaster)
 [![Coverage](https://codecov.io/gh/thofma/Tally.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/thofma/Tally.jl)
 
+Table of contents
+
+[Installation](https://github.com/thofma/Tally.jl#installation)
+[Usage](https://github.com/thofma/Tally.jl#usage)
+- [Creating a tally (frequency count)](https://github.com/thofma/Tally.jl#creating-a-tally-frequency-count)
+- [Plotting a tally](https://github.com/thofma/Tally.jl#plotting-a-tally)
+- [Plotting using Plots.jl](https://github.com/thofma/Tally.jl#plotting-a-tally-using-plotsjl)
+[Advanced usage](https://github.com/thofma/Tally.jl#advanced-usage)
+- [Tally is too slow](https://github.com/thofma/Tally.jl#tally-is-too-slow)
+- [Counting up to an equivalence](https://github.com/thofma/Tally.jl#counting-up-to-an-equivalence)
+- [Lazy tallies and animations](https://github.com/thofma/Tally.jl#lazy-tallies-and-animations)
+
 ## Installation
 
 Since Tally.jl is registered package, it can be installed simply as:
@@ -172,7 +184,7 @@ julia> Tally.plot(T)
                           └                                        ┘
 ```
 
-### Lazy tallys and animations
+### Lazy tallies and animations
 
 For maximal showoff potential, one can also construct "lazy" tallies, which can be plotted
 as an animation.
