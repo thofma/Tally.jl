@@ -13,15 +13,15 @@
 
 Table of contents
 
-[Installation](https://github.com/thofma/Tally.jl#installation)
-[Usage](https://github.com/thofma/Tally.jl#usage)
-- [Creating a tally (frequency count)](https://github.com/thofma/Tally.jl#creating-a-tally-frequency-count)
-- [Plotting a tally](https://github.com/thofma/Tally.jl#plotting-a-tally)
-- [Plotting using Plots.jl](https://github.com/thofma/Tally.jl#plotting-a-tally-using-plotsjl)
-[Advanced usage](https://github.com/thofma/Tally.jl#advanced-usage)
-- [Tally is too slow](https://github.com/thofma/Tally.jl#tally-is-too-slow)
-- [Counting up to an equivalence](https://github.com/thofma/Tally.jl#counting-up-to-an-equivalence)
-- [Lazy tallies and animations](https://github.com/thofma/Tally.jl#lazy-tallies-and-animations)
+- [Installation](https://github.com/thofma/Tally.jl#installation)
+- [Usage](https://github.com/thofma/Tally.jl#usage)
+  - [Creating a tally (frequency count)](https://github.com/thofma/Tally.jl#creating-a-tally-frequency-count)
+  - [Plotting a tally](https://github.com/thofma/Tally.jl#plotting-a-tally)
+  - [Plotting using Plots.jl](https://github.com/thofma/Tally.jl#plotting-a-tally-using-plotsjl)
+- [Advanced usage](https://github.com/thofma/Tally.jl#advanced-usage)
+  - [Tally is too slow](https://github.com/thofma/Tally.jl#tally-is-too-slow)
+  - [Counting up to an equivalence](https://github.com/thofma/Tally.jl#counting-up-to-an-equivalence)
+  - [Lazy tallies and animations](https://github.com/thofma/Tally.jl#lazy-tallies-and-animations)
 
 ## Installation
 
