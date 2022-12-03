@@ -86,9 +86,11 @@ julia> Tally.plot(T)
       └                                        ┘
 ```
 
+See `?Tally.plot` for a list of options on how to customize this plot, which includes giving it a title or choosing a different ordering.
+
 ### Plotting a tally using Plots.jl
 
-If you have Plots.jl installed, you can also plot it using this functionality:
+If you have Plots.jl installed and loaded, you can also plot it using this functionality:
 
 ```julia
 julia> T = tally(rand(-1:1, 10, 10))
@@ -110,7 +112,7 @@ See `?Plots.bar` for more information on how to customize this plot.
 
 ### Tally is too slow
 
-To work also for objects, for which a consistent hash is not implemented, Tally does not use `hash` by default. This can be enabled using the `use_hash = true` keyword.
+To work also for objects for which a consistent hash is not implemented, `tally` does not use `hash` by default. This can be enabled using the `use_hash = true` keyword.
 
 ```julia
 julia> v = [rand([[1], [2]]) for i in 1:100000];
@@ -130,7 +132,7 @@ Tally with 100000 items in 2 groups:
 
 ### Counting up to an equivalence
 
-When counting, sometimes one wants to do a tally only with respect to some other invariant or with respect to a relation different from `==`. For this task Tally provides the `by` and `equivalence` keyword arguments. Tally will consider two elements `x, y` from the input collection equal when counting, whenever `equivalence(by(x), by(y))` is `true`. The default values are `by = identity` and `equivalence = isequal`. If `equivalence` does not define an equivalence relation, the result will be nonsense. The optional `equivalence` argument is important in case the equivalence relation under consideration does not admit easily computable unique representatives.
+When counting, sometimes one wants to do a tally only with respect to some other invariant or with respect to an equivalence relation different from `==`. For this task `tally` provides the `by` and `equivalence` keyword arguments. The function `tally` will consider two elements `x, y` from the input collection equal when counting, whenever `equivalence(by(x), by(y))` is `true`. The default values are `by = identity` and `equivalence = isequal`. If `equivalence` does not define an equivalence relation, the result will be nonsense. 
 
 Note that to indicate that the counting is non-standard, Tally will print the objects within square brackets `[ ]`. 
 
@@ -157,7 +159,7 @@ Tally with 6 items in 3 groups:
 [aa]  | 1 | 0.17%
 ```
 
-Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `equivalence` functionality. We make a tally of the 2-parts of the class group of the first imaginary quadratic number fields:
+The optional `equivalence` argument is important in case the equivalence relation under consideration does not admit easily computable unique representatives. Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `equivalence` functionality. We make a tally of the 2-parts of the class groups of the first imaginary quadratic number fields:
 
 ```julia
 julia> using Hecke;
@@ -198,3 +200,5 @@ julia> Tally.animate(T, badges = 4, delay = 0.2, title = "Will 0 win?")
 will yield
 
 ![tally_run](https://user-images.githubusercontent.com/11231648/205158218-fbe4b8c5-79de-4e73-b6fb-76c37b003f0b.svg)
+
+Note that a lazy tally `T` can be converted to an ordinary tally object by invoking `materialize(T)`.
