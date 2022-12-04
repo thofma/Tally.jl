@@ -384,8 +384,15 @@ function plot(T::TallyT; sortby = :value, percentage = true, reverse = false, ti
 
   keys, vals, percentage = _prepare_for_plot(T, sortby = sortby, reverse =reverse)
 
-  P = barplot(_pad_the_labels(keys), vals, title = title)
   _, percentage = _get_nice_percentages(percentage)
+
+  if length(T) == 0
+    print("No plot for empty tallies.")
+    return
+  end
+
+  P = barplot(_pad_the_labels(keys), vals, title = title)
+
   if show_percentage
     for i in 1:length(percentage)
       label!(P, :r, i, percentage[i])

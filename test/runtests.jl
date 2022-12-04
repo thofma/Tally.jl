@@ -71,6 +71,10 @@ Base.hash(::A) = rand(UInt)
   s = sprint(show, "text/plain", T)
   @test occursin("1", s)
 
+  T = tally(append!([1 for i in 1:100000], [2 for i in 1:100001]))
+  s = sprint(show, "text/plain", T)
+  @test occursin("1", s)
+
   # unicode plotting
  
   # decimals are different on julia 1.0
@@ -143,6 +147,9 @@ Base.hash(::A) = rand(UInt)
     @test string(Tally.plot(T, title = "Tally")) == plot7
 
     @test bar(T) isa Plots.Plot
+
+    T = tally(Int[])
+    Tally.plot(T)
 
     # Distorted percentages
 
