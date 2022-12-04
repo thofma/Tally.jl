@@ -178,14 +178,39 @@ function _maximal_length_of_items(keys, vals)
 end
 
 function _get_nice_percentages(per::Vector{Float64})
-  find_ndigits = 2
-  for p in per
-    iszero(p) && continue
-    while all(x -> isequal(x, '0') || isequal(x, '.'), sprint_formatted("%.$(find_ndigits)f", p))
-      find_ndigits += 1
+  find_ndigits = 0
+  nice = String[]
+  if length(per) == 0
+    return 0, String[]
+  end
+  while true
+    for p in per
+      iszero(p) && continue
+      while all(x -> x in [' ', '0', '.'], sprint_formatted("%3.$(find_ndigits)f", p))
+        find_ndigits += 1
+      end
+    end
+    nice = [lpad(sprint_formatted("%3.$(find_ndigits)f", p), find_ndigits + 4)* "%" for p in per]
+
+    # now check if different values are distinguished
+    good = true
+    for i in 1:length(per)
+      if any(j -> per[i] != per[j] && nice[i] == nice[j], 1:length(per))
+        find_ndigits += 1
+        good = false
+        break
+      end
+    end
+    if good
+      break
     end
   end
-  return find_ndigits, [sprint_formatted("%.$(find_ndigits)f", p)* "%" for p in per]
+
+  while all(x -> startswith(x, ' '), nice)
+    nice = map(x -> x[2:end], nice)
+  end
+
+  return find_ndigits, nice
 end
 
 # Print it as a table
@@ -193,16 +218,16 @@ function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
   first = true
   n = mapreduce(x -> x[2], +, T.data, init = 0)
   k, v = _prepare_for_plot(T)
-  print(io, "Tally with $n items in $(length(T.data)) groups:\n")
+  print(io, "Tally with $n items in $(length(T.data)) groups")
+  if length(T) == 0
+    return
+  end
+  print(io, ":")
   l_names, l_digits = _maximal_length_of_items(k, v)
-  percentages = [x/n for x in v]
+  percentages = [100 * x/n for x in v]
   find_ndigits, percentage_strings = _get_nice_percentages(percentages)
   for (i, x) in enumerate(zip(k, v))
-    if first
-      first = false
-    else
-      println(io)
-    end
+    println(io)
     print(io, rpad(x[1], l_names))
     print(io, " | ")
     print(io, lpad(sprint(show, x[2]), l_digits))
@@ -301,7 +326,7 @@ function _prepare_for_plot(T::TallyT; sortby = :value, reverse = false, title = 
   for x in T
     push!(keys, x[1])
     push!(vals, x[2])
-    push!(percentage, x[2]/n)
+    push!(percentage, 100 * x[2]/n)
   end
   if isempty(T)
     return keys, vals, percentage
