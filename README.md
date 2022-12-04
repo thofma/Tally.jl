@@ -192,13 +192,13 @@ For maximal showoff potential, one can also construct "lazy" tallies, which can 
 as an animation.
 
 ```julia
-julia> = lazy_tally((rand(-1:1) for i in 1:100));
+julia>T = lazy_tally((rand(-1:1) for i in 1:100));
 
 julia> Tally.animate(T, badges = 4, delay = 0.2, title = "Will 0 win?")
 ```
 
 will yield
 
-![tally_run](https://user-images.githubusercontent.com/11231648/205158218-fbe4b8c5-79de-4e73-b6fb-76c37b003f0b.svg)
+![tally_run2](https://user-images.githubusercontent.com/11231648/205502139-55ca4875-f3ff-429c-af50-5141acb85f5c.svg)
 
 Note that a lazy tally `T` can be converted to an ordinary tally object by invoking `materialize(T)`.
