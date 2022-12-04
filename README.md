@@ -39,8 +39,8 @@ Given some data stored in an object `data`, one can count the number of occurren
 ```julia
 julia> T = tally(["x", "x", "y", "x"])
 Tally with 4 items in 2 groups:
-"x" | 3 | 0.75%
-"y" | 1 | 0.25%
+x | 3 | 75%
+y | 1 | 25%
 ```
 
 One can put in any iterable object
@@ -48,9 +48,9 @@ One can put in any iterable object
 ```julia
 julia> T = tally(rand(-1:1, 10, 10)) # a random 10x10 matrix with entries in [-1, 0, 1]
 Tally with 100 items in 3 groups:
--1 | 37 | 0.37%
-0  | 36 | 0.36%
-1  | 27 | 0.27%
+-1 | 37 | 37%
+1  | 32 | 32%
+0  | 31 | 31%
 ```
 
 A tally can be extended by adding more items via `push!` or `append!`.
@@ -58,13 +58,13 @@ A tally can be extended by adding more items via `push!` or `append!`.
 ```julia
 julia> push!(T, "x")
 Tally with 5 items in 2 groups:
-x | 4 | 0.80%
-y | 1 | 0.20%
+x | 4 | 80%
+y | 1 | 20%
 
 julia> append!(T, ["x", "y", "y"])
 Tally with 8 items in 2 groups:
-x | 5 | 0.62%
-y | 3 | 0.38%
+x | 5 | 62%
+y | 3 | 38%
 ```
 
 ### Plotting a tally
@@ -74,15 +74,15 @@ Tally.jl comes with some basic plotting functionalities to plot tallies within t
 ```julia
 julia> T = tally(rand(-1:1, 10, 10))
 Tally with 100 items in 3 groups:
-1  | 38 | 0.38%
-0  | 34 | 0.34%
--1 | 28 | 0.28%
+0  | 43 | 43%
+1  | 33 | 33%
+-1 | 24 | 24%
 
 julia> Tally.plot(T)
       ┌                                        ┐
-   1  ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 38   0.38%
-   0  ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 34       0.34%
-   -1 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■ 28            0.28%
+   0  ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 43   43%
+   1  ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 33           33%
+   -1 ┤■■■■■■■■■■■■■■■■■■■■ 24                   24%
       └                                        ┘
 ```
 
@@ -95,9 +95,9 @@ If you have Plots.jl installed and loaded, you can also plot it using this funct
 ```julia
 julia> T = tally(rand(-1:1, 10, 10))
 Tally with 100 items in 3 groups:
-1  | 38 | 0.38%
-0  | 34 | 0.34%
--1 | 28 | 0.28%
+1  | 38 | 38%
+0  | 34 | 34%
+-1 | 28 | 28%
 
 julia> bar(T, legend = false)
 ```
@@ -120,14 +120,14 @@ julia> v = [rand([[1], [2]]) for i in 1:100000];
 julia> @btime tally($v)
   14.563 ms (100005 allocations: 1.53 MiB)
 Tally with 100000 items in 2 groups:
-[2] | 50145 | 0.50%
-[1] | 49855 | 0.50%
+[2] | 50146 | 50.1%
+[1] | 49854 | 49.9%
 
 julia> @btime tally($v, use_hash = true)
   2.183 ms (7 allocations: 720 bytes)
 Tally with 100000 items in 2 groups:
-[2] | 50145 | 0.50%
-[1] | 49855 | 0.50%
+[2] | 50146 | 50.1%
+[1] | 49854 | 49.9%
 ```
 
 ### Counting up to an equivalence
@@ -141,22 +141,22 @@ julia> v = 1:100000;
 
 julia> tally(v, by = iseven)
 Tally with 100000 items in 2 groups:
-[2] | 50000 | 0.50%
-[1] | 50000 | 0.50%
+[2] | 50000 | 50%
+[1] | 50000 | 50%
 
 julia> tally(v, by = x -> mod(x, 3))
 Tally with 100000 items in 3 groups:
-[1] | 33334 | 0.33%
-[3] | 33333 | 0.33%
-[2] | 33333 | 0.33%
+[1] | 33334 | 33.334%
+[3] | 33333 | 33.333%
+[2] | 33333 | 33.333%
 
 julia> v = ["abb", "ba", "aa", "ba", "bbba", "aaab"];
 
 julia> tally(v, equivalence = (x, y) -> first(x) == first(y) && last(x) == last(y))
 Tally with 6 items in 3 groups:
-[ba]  | 3 | 0.50%
-[abb] | 2 | 0.33%
-[aa]  | 1 | 0.17%
+[ba]  | 3 | 50%
+[abb] | 2 | 33%
+[aa]  | 1 | 17%
 ```
 
 The optional `equivalence` argument is important in case the equivalence relation under consideration does not admit easily computable unique representatives. Here is a real world example using `Hecke.jl`, where we only want to count algebraic objects up to isomorphism and thus can make use of the `equivalence` functionality. We make a tally of the 2-parts of the class groups of the first imaginary quadratic number fields:
@@ -170,19 +170,19 @@ julia> T = tally((class_group(quadratic_field(-d)[1])[1] for d in ds), equivalen
 
 julia> Tally.plot(T)
                           ┌                                        ┐
-   [GrpAb: Z/2]           ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 148   0.243%
-   [GrpAb: (Z/2)^2]       ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 122         0.201%
-   [GrpAb: Z/1]           ┤■■■■■■■■■■■■■■■■■■■■■ 89                  0.146%
-   [GrpAb: Z/4]           ┤■■■■■■■■■■■■■■■ 64                        0.105%
-   [GrpAb: Z/2 x Z/4]     ┤■■■■■■■■■■■ 48                            0.079%
-   [GrpAb: Z/8]           ┤■■■■■■■■■ 39                              0.064%
-   [GrpAb: Z/2 x Z/8]     ┤■■■■■■■■ 35                               0.058%
-   [GrpAb: (Z/2)^3]       ┤■■■■ 19                                   0.031%
-   [GrpAb: (Z/2)^2 x Z/4] ┤■■■■ 18                                   0.030%
-   [GrpAb: Z/16]          ┤■■■ 13                                    0.021%
-   [GrpAb: Z/32]          ┤■■ 7                                      0.012%
-   [GrpAb: Z/2 x Z/16]    ┤■ 5                                       0.008%
-   [GrpAb: (Z/2)^2 x Z/8] ┤ 1                                        0.002%
+   [GrpAb: Z/2]           ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 148   24.3%
+   [GrpAb: (Z/2)^2]       ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 122         20.1%
+   [GrpAb: Z/1]           ┤■■■■■■■■■■■■■■■■■■■■■ 89                  14.6%
+   [GrpAb: Z/4]           ┤■■■■■■■■■■■■■■■ 64                        10.5%
+   [GrpAb: Z/2 x Z/4]     ┤■■■■■■■■■■■ 48                             7.9%
+   [GrpAb: Z/8]           ┤■■■■■■■■■ 39                               6.4%
+   [GrpAb: Z/2 x Z/8]     ┤■■■■■■■■ 35                                5.8%
+   [GrpAb: (Z/2)^3]       ┤■■■■ 19                                    3.1%
+   [GrpAb: (Z/2)^2 x Z/4] ┤■■■■ 18                                    3.0%
+   [GrpAb: Z/16]          ┤■■■ 13                                     2.1%
+   [GrpAb: Z/32]          ┤■■ 7                                       1.2%
+   [GrpAb: Z/2 x Z/16]    ┤■ 5                                        0.8%
+   [GrpAb: (Z/2)^2 x Z/8] ┤ 1                                         0.2%
                           └                                        ┘
 ```
 
