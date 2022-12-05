@@ -286,7 +286,7 @@ function _push!(T::TallyT, x)
 end
 
 function Base.sort!(T::TallyT; rev = true, kwargs...)
-  p = sortperm(T.values; rev, kwargs...)
+  p = sortperm(T.values; rev = rev, kwargs...)
   permute!(T.keys, p)
   permute!(T.values, p)
   return T
