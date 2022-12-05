@@ -306,6 +306,24 @@ function Base.append!(T::TallyT, it)
   return T
 end
 
+function Base.get(T::TallyT, key, default)
+  ind = findfirst(==(key), T.keys)
+  if ind === nothing
+    return default
+  else
+    return T.values[ind]
+  end
+end
+
+function Base.:+(T1::TallyT, T2::TallyT)
+  return TallyT(keys(T1), [T1.values[i] + T2[key] for (i, key) in enumerate(keys(T1))])
+end
+
+
+function Base.:-(T1::TallyT, T2::TallyT)
+  return TallyT(keys(T1), [T1.values[i] - T2[key] for (i, key) in enumerate(keys(T1))])
+end
+
 ################################################################################
 #
 #  Plotting

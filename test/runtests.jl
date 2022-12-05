@@ -199,4 +199,12 @@ Base.hash(::A) = rand(UInt)
   @test sprint(show, "text/plain", T) isa String
   @test sprint(show, T) isa String
   @test  materialize(T) isa Tally.TallyT
+
+  @testset "Arithmetic" begin
+    T1 = tally([2, 1, 1, 1, 2])
+    T2 = tally([2, 2, 1, 1, 2])
+    @test T1 + T2 == tally([1, 1, 1, 1, 1, 2, 2, 2, 2, 2])
+    @test T1 - T1 == Tally.TallyT([1, 2], [0, 0])
+    @test T1 - T2 == Tally.TallyT([1, 2], [1, -1])
+  end
 end
