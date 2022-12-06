@@ -214,7 +214,7 @@ end
 # Print it as a table
 function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
   first = true
-  n = sum(T.values, init = 0)
+  n = sum(T.values)
   k, v = _prepare_for_plot(T)
   print(io, "Tally with $n items in $(length(T.keys)) groups")
   if length(T) == 0
@@ -348,7 +348,7 @@ function _prepare_for_plot(T::TallyT; sortby = :value, reverse = false, title = 
   keys = []
   vals = Int[]
   percentage = Float64[]
-  n = sum(T.values, init = 0)
+  n = sum(T.values)
   for x in T
     push!(keys, x[1])
     push!(vals, x[2])
