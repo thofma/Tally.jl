@@ -176,6 +176,9 @@ Base.hash(::A) = rand(UInt)
   push!(T, 2)
   @test T.keys == [2, 1]
   @test T.values == [4, 3]
+  @test T[1] == 3
+  @test get(T, 3, 5) == 5
+  @test_throws KeyError T[3]
 
   T = tally([2, 1, 1, 1, 2])
   append!(T, [2, 1, 2, 2])
@@ -191,6 +194,10 @@ Base.hash(::A) = rand(UInt)
   append!(T, [2, -2, 2])
   @test T.keys == [2, -1]
   @test T.values == [5, 4]
+  @test T[2] == 5
+  @test T[-2] == 5
+  @test_throws KeyError T[3]
+  @test get(T, 3, 5) == 5
 
   # lazy tally
   T = lazy_tally((rand(-1:1) for i in 1:100))
@@ -204,7 +211,17 @@ Base.hash(::A) = rand(UInt)
     T1 = tally([2, 1, 1, 1, 2])
     T2 = tally([2, 2, 1, 1, 2])
     @test T1 + T2 == tally([1, 1, 1, 1, 1, 2, 2, 2, 2, 2])
-    @test T1 - T1 == Tally.TallyT([1, 2], [0, 0])
+    @test T1 - T1 == Tally.TallyT(Int[], Int[])
     @test T1 - T2 == Tally.TallyT([1, 2], [1, -1])
+
+    T1 = tally([1, 1, 2])
+    T2 = tally([2, 3, 3])
+    @test T1 + T2 == tally([1, 1, 2, 2, 3, 3])
+    @test (T1 + T2) - T1 == T2
+
+    T1 = tally([], by = sin)
+    T2 = tally([])
+    @test_throws ErrorException T1 + T2
+    @test_throws ErrorException T1 - T2
   end
 end

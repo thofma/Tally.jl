@@ -20,7 +20,7 @@ mutable struct TallyT{T} <: AbstractDict{T, Int}
   by
   equivalence
 
-  function TallyT(keys::Vector{T}, values::Vector{Int}, by = isequal, equivalence = identity) where {T}
+  function TallyT(keys::Vector{T}, values::Vector{Int}, by = identity, equivalence = isequal) where {T}
     p = sortperm(values, rev = true)
     return new{T}(keys[p], values[p], by, equivalence)
   end
@@ -307,8 +307,8 @@ function Base.append!(T::TallyT, it)
 end
 
 function Base.get(T::TallyT, key, default)
-  ind = findfirst(==(key), T.keys)
-  if ind === nothing
+  fl, ind = _has_key(key, T.keys, T.by, T.equivalence)
+  if !fl
     return default
   else
     return T.values[ind]
@@ -316,12 +316,31 @@ function Base.get(T::TallyT, key, default)
 end
 
 function Base.:+(T1::TallyT, T2::TallyT)
-  return TallyT(keys(T1), [T1.values[i] + T2[key] for (i, key) in enumerate(keys(T1))])
+  !(T1.by === T2.by && T1.equivalence === T2.equivalence) &&
+    error("Tallies incompatible")
+  K = copy(keys(T1))
+  for k in keys(T2)
+    if !_has_key(k, K, T1.by, T1.equivalence)[1]
+      push!(K, k)
+    end
+  end
+  # To get the right array type
+  V = empty!(vcat(T1.values, T2.values))
+  KK = eltype(K)[]
+  for k in K
+    v = get(T1, k, 0) + get(T2, k, 0)
+    if iszero(v)
+      continue
+    end
+    push!(KK, k)
+    push!(V, v)
+  end
+  return TallyT(KK, V)
 end
 
-
 function Base.:-(T1::TallyT, T2::TallyT)
-  return TallyT(keys(T1), [T1.values[i] - T2[key] for (i, key) in enumerate(keys(T1))])
+  T3 = TallyT(T2.keys, -T2.values)
+  return T1 + T3
 end
 
 ################################################################################
