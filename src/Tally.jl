@@ -14,19 +14,15 @@ export tally, lazy_tally, materialize
 #
 ################################################################################
 
-mutable struct TallyT{T}
-  data::Vector{Pair{T, Int}}
+mutable struct TallyT{T} <: AbstractDict{T, Int}
+  keys::Vector{T}
+  values::Vector{Int}
   by
   equivalence
 
-  function TallyT(data::Vector{Pair{T, Int}}) where {T}
-    sort!(data, by = x -> x[2], rev = true)
-    return new{T}(data, identity, isequal)
-  end
-
-  function TallyT(data::Vector{Pair{T, Int}}, by, equivalence) where {T}
-    sort!(data, by = x -> x[2], rev = true)
-    return new{T}(data, by, equivalence)
+  function TallyT(keys::Vector{T}, values::Vector{Int}, by = identity, equivalence = isequal) where {T}
+    p = sortperm(values, rev = true)
+    return new{T}(keys[p], values[p], by, equivalence)
   end
 end
 
@@ -54,10 +50,10 @@ function _create_dict(it::T) where {T}
   end
 end
 
-# D is a Vector{<:Pair} 
-function _has_key(x, D::Vector, by, equivalence)
-  i = findfirst(D) do y
-    return equivalence(by(x), by(y[1]))
+# D is a Vector{<:Pair}
+function _has_key(x, K::Vector, by, equivalence)
+  i = findfirst(K) do y
+    return equivalence(by(x), by(y))
   end
   if i !== nothing
     return true, i
@@ -72,12 +68,14 @@ function _tally_generic(it::T, by, equivalence) where {T}
   if Base.IteratorEltype(it) == Base.HasEltype()
     # if it has an element type, use it
     S = eltype(T)
-    D = Vector{Pair{S, Int}}()
+    K = Vector{S}()
+    V = Vector{Int}()
   else
     # do whatever you wan
-    D = Vector{Pair{Any, Int}}()
+    K = Vector{Any}()
+    V = Vector{Int}()
   end
-  t = TallyT(D, by, equivalence)
+  t = TallyT(K, V, by, equivalence)
   append!(t, it)
   return t
 end
@@ -89,7 +87,7 @@ function _tally_dict(it)
     k = get!(D, x, 0)
     D[x] = k + 1
   end
-  return TallyT(collect(D))
+  return TallyT(collect(keys(D)), collect(values(D)))
 end
 
 """
@@ -147,7 +145,7 @@ For the keyword arguments see `tally`.
 lazy_tally(it; by = identity, equivalence = isequal) = LazyTallyT(it, identity, equivalence)
 
 function materialize(T::LazyTallyT)
-  _T = TallyT(Vector{Pair{Any, Int}}(), T.by, T.equivalence)
+  _T = TallyT(Vector{Any}(), Vector{Int}(), T.by, T.equivalence)
   append!(_T, T.it)
   return _T
 end
@@ -216,9 +214,9 @@ end
 # Print it as a table
 function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
   first = true
-  n = mapreduce(x -> x[2], +, T.data, init = 0)
+  n = sum(T.values)
   k, v = _prepare_for_plot(T)
-  print(io, "Tally with $n items in $(length(T.data)) groups")
+  print(io, "Tally with $n items in $(length(T.keys)) groups")
   if length(T) == 0
     return
   end
@@ -240,7 +238,7 @@ end
 function Base.show(io::IO, T::TallyT)
   print(io, "Tally(")
   first = true
-  for x in T.data
+  for x in T
     if first
       _print_pair(io, x)
       first = false
@@ -262,31 +260,41 @@ end
 #
 ################################################################################
 
-@inline Base.iterate(T::TallyT) = iterate(T.data)
+Base.keys(T::TallyT) = T.keys
 
-@inline function Base.iterate(T::TallyT, st)
-  x = Base.iterate(T.data, st)
-  return (x === nothing ? nothing : x)
-end
+Base.values(T::TallyT) = T.values
 
 Base.eltype(::Type{TallyT{T}}) where {T} = Pair{T, Int}
 
-Base.length(T::TallyT) = length(T.data)
+Base.length(T::TallyT) = length(T.keys)
+
+function Base.iterate(T::TallyT, st = 1)
+  return (st > length(T) ? nothing : (T.keys[st] => T.values[st], st + 1))
+end
 
 function _push!(T::TallyT, x)
-  D = T.data
-  fl, j = _has_key(x, D, T.by, T.equivalence)
+  K = T.keys
+  V = T.values
+  fl, j = _has_key(x, K, T.by, T.equivalence)
   if fl
-    D[j] = (D[j][1] => D[j][2] + 1)
+    V[j] = V[j] + 1
   else
-    push!(D, (x => 1))
+    push!(K, x)
+    push!(V, 1)
   end
+  return T
+end
+
+function Base.sort!(T::TallyT; rev = true, kwargs...)
+  p = sortperm(T.values; rev = rev, kwargs...)
+  permute!(T.keys, p)
+  permute!(T.values, p)
   return T
 end
 
 function Base.push!(T::TallyT, x)
   _push!(T, x)
-  sort!(T.data, by = x -> x[2], rev = true)
+  sort!(T)
   return T
 end
 
@@ -294,8 +302,45 @@ function Base.append!(T::TallyT, it)
   for x in it
     _push!(T, x)
   end
-  sort!(T.data, by = x -> x[2], rev = true)
+  sort!(T)
   return T
+end
+
+function Base.get(T::TallyT, key, default)
+  fl, ind = _has_key(key, T.keys, T.by, T.equivalence)
+  if !fl
+    return default
+  else
+    return T.values[ind]
+  end
+end
+
+function Base.:+(T1::TallyT, T2::TallyT)
+  !(T1.by === T2.by && T1.equivalence === T2.equivalence) &&
+    error("Tallies incompatible")
+  K = copy(keys(T1))
+  for k in keys(T2)
+    if !_has_key(k, K, T1.by, T1.equivalence)[1]
+      push!(K, k)
+    end
+  end
+  # To get the right array type
+  V = Base.promote_eltype(T1.values, T2.values)[]
+  KK = eltype(K)[]
+  for k in K
+    v = get(T1, k, 0) + get(T2, k, 0)
+    if iszero(v)
+      continue
+    end
+    push!(KK, k)
+    push!(V, v)
+  end
+  return TallyT(KK, V)
+end
+
+function Base.:-(T1::TallyT, T2::TallyT)
+  T3 = TallyT(T2.keys, -T2.values)
+  return T1 + T3
 end
 
 ################################################################################
@@ -322,7 +367,7 @@ function _prepare_for_plot(T::TallyT; sortby = :value, reverse = false, title = 
   keys = []
   vals = Int[]
   percentage = Float64[]
-  n = mapreduce(x -> x[2], +, T.data, init = 0)
+  n = sum(T.values)
   for x in T
     push!(keys, x[1])
     push!(vals, x[2])
@@ -406,7 +451,7 @@ RecipesBase.@recipe f(::Type{Tally.TallyT{S}}, T::Tally.TallyT{S}) where {S} = b
 # dynamic plot
 
 function _dynamic_plot(it, by, equivalence; sortby = :value, percentage = true, reverse = false, title = "", delay = 0.1, badges = 1)
-  _T = TallyT(Vector{Pair{Any, Int}}(), by, equivalence)
+  _T = TallyT(Vector{Any}(), Vector{Int}(), by, equivalence)
   for (i, x) in enumerate(it)
     push!(_T, x)
     print("\033[2J")
