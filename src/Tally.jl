@@ -325,7 +325,7 @@ function Base.:+(T1::TallyT, T2::TallyT)
     end
   end
   # To get the right array type
-  V = empty!(vcat(T1.values, T2.values))
+  V = Base.promote_eltype(T1.values, T2.values)[]
   KK = eltype(K)[]
   for k in K
     v = get(T1, k, 0) + get(T2, k, 0)
