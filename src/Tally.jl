@@ -4,8 +4,6 @@ import Printf: @sprintf
 
 import UnicodePlots: barplot, label!
 
-import RecipesBase
-
 export tally, lazy_tally, materialize
 
 ################################################################################
@@ -445,8 +443,6 @@ function plot(T::TallyT; sortby = :value, percentage = true, reverse = false, ti
   end
   return P
 end
-
-RecipesBase.@recipe f(::Type{Tally.TallyT{S}}, T::Tally.TallyT{S}) where {S} = begin x, y = Tally._prepare_for_plot(T); return collect(zip(string.(x), y)) end
 
 # dynamic plot
 
