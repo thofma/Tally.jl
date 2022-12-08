@@ -5,18 +5,16 @@ version = "0.3.0"
 
 [deps]
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [compat]
-julia = "1"
-RecipesBase = "1"
 UnicodePlots = "2,3.3"
+julia = "1"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "Plots", "Documenter"]
