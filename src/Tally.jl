@@ -4,7 +4,7 @@ import Printf: @sprintf
 
 import UnicodePlots: barplot, label!
 
-export tally, lazy_tally, materialize
+export tally, lazy_tally, materialize, prison_count, show_style
 
 ################################################################################
 #
@@ -209,8 +209,7 @@ function _get_nice_percentages(per::Vector{Float64})
   return find_ndigits, nice
 end
 
-# Print it as a table
-function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
+function _show_as_table(io::IO, T::TallyT)
   first = true
   n = sum(T.values)
   k, v = _prepare_for_plot(T)
@@ -229,6 +228,87 @@ function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
     print(io, lpad(sprint(show, x[2]), l_digits))
     print(io, " | ")
     print(io, percentage_strings[i])
+  end
+end
+
+function _show_as_plot(io::IO, T::TallyT)
+  print(io, plot(T))
+end
+
+function _prison_count(n)
+  q, r = divrem(n, 5)
+  return "┼┼┼┼ "^q * "│"^r
+end
+
+function _show_as_prison(io::IO, T::TallyT)
+  k, v = _prepare_for_plot(T)
+  l_names, l_digits = _maximal_length_of_items(k, v)
+  m = isempty(values(T)) ? 0 : maximum(values(T))
+  first = true
+  for (kk, vv) in zip(keys(T), values(T))
+    if !first
+      println(io, "━"^(l_names + 1) * "╋" * "━"^(m + 1))
+    else
+      first = false
+    end
+    print(io, rpad(kk, l_names), " ┃" )
+    print(io, " ", _prison_count(vv))
+    println(io)
+  end
+end
+
+"""
+    prison_count(T::Tally)
+
+Print the tally using prison style:
+```jldoctest
+julia> T = tally([1, 1, 1, 2, 2, 2, 2, 2, 2, -1]);
+
+julia> prison_count(T)
+2  ┃ ┼┼┼┼ │
+━━━╋━━━━━━━
+1  ┃ │││
+━━━╋━━━━━━━
+-1 ┃ │
+```
+"""
+function prison_count(T::TallyT)
+  _show_as_prison(stdout, T)
+end
+
+SHOW_STYLE = Ref(:table)
+
+function show_style()
+  SHOW_STYLE[]
+end
+
+"""
+    show_style([style::Symbol])
+
+With no argument, this function returns the current style used for the `show` method,
+that is, for printing.
+
+If `style::Symbol` is provided, this sets the show style to `style`. Possible styles are
+- `:table`, the default,
+- `:plot`, print tallies via `Tally.plot`,
+- `:prison`, display the counts using prison mode.
+"""
+function show_style(style::Symbol)
+  if !(style in [:table, :plot, :prison])
+    error("Style must be either, `:table`, `:plot` or `:prison`")
+  end
+  SHOW_STYLE[] = style
+end
+
+# Print it as a table
+function Base.show(io::IO, ::MIME"text/plain", T::TallyT)
+  S = show_style()
+  if S === :table
+    _show_as_table(io, T)
+  elseif S === :plot
+    _show_as_plot(io, T)
+  elseif S === :prison
+    _show_as_prison(io, T)
   end
 end
 
