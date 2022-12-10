@@ -18,6 +18,8 @@ Table of contents
 - [Usage](https://github.com/thofma/Tally.jl#usage)
   - [Creating a tally (frequency count)](https://github.com/thofma/Tally.jl#creating-a-tally-frequency-count)
   - [Plotting a tally](https://github.com/thofma/Tally.jl#plotting-a-tally)
+  - [Prison count](https://github.com/thofma/Tally.jl#prison-count)
+  - [Tables.jl interface and printing using PrettyTables.jl](https://github.com/thofma/Tally.jl/edit/master/README.md#tablesjl-interface-and-printing-using-prettytablejl)
   - [Plotting using Plots.jl](https://github.com/thofma/Tally.jl#plotting-a-tally-using-plotsjl)
 - [Advanced usage](https://github.com/thofma/Tally.jl#advanced-usage)
   - [Tally is too slow](https://github.com/thofma/Tally.jl#tally-is-too-slow)
@@ -89,9 +91,42 @@ julia> Tally.plot(T)
 
 See `?Tally.plot` for a list of options on how to customize this plot, which includes giving it a title or choosing a different ordering.
 
-### Plotting a tally using Plots.jl
+### Prison count
 
-If you have Plots.jl installed and loaded, you can also plot it using this functionality:
+For tallies with counts not too large and pure entertainment, one can also plot tallies using a "prison count":
+
+```julia
+julia> T = tally([1, 1, 1, 2, 2, 2, 2, 2, 2, -1]);
+
+julia> prison_count(T)
+2  ┃ ┼┼┼┼ │
+━━━╋━━━━━━━
+1  ┃ │││
+━━━╋━━━━━━━
+-1 ┃ │
+```
+
+### [Tables.jl](https://github.com/JuliaData/Tables.jl) interface and printing using [PrettyTable.jl](https://github.com/ronisbr/PrettyTables.jl)
+
+The objects constructed by Tally.jl implement the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface and thus can be printed using [PrettyTable.jl](https://github.com/ronisbr/PrettyTables.jl):
+
+```julia
+julia> T = tally([1, 1, 1, 2, 2, 2, 2, 2, 2, -1]);
+
+julia> pretty_table(T)
+┌───────┬────────┐
+│  Keys │ Values │
+│ Int64 │  Int64 │
+├───────┼────────┤
+│     2 │      6 │
+│     1 │      3 │
+│    -1 │      1 │
+└───────┴────────┘
+```
+
+### Plotting a tally using [Plots.jl](https://github.com/JuliaPlots/Plots.jl)
+
+If you have [Plots.jl](https://github.com/JuliaPlots/Plots.jl) installed and loaded, you can also plot it using this functionality:
 
 ```julia
 julia> T = tally(rand(-1:1, 10, 10))
