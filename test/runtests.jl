@@ -58,31 +58,55 @@ Base.hash(::A) = rand(UInt)
   @test T.keys == [A(1)]
   @test T.values == [3]
 
+  @test_throws ErrorException show_style(:bla)
 
   T = tally([2, 1, 1, 1, 1, 2, 2, 3])
-
   @test sprint(show, "text/plain", T) isa String
   @test sprint(show, T) isa String
+  prison_count(T)
 
   T = tally([2, 1, 1, 1, 1, 2, 2, 3], by = x -> x^2)
   s = sprint(show, "text/plain", T)
   @test occursin("[1]", s)
+  prison_count(T)
+  show_style(:prison)
+  s = sprint(show, "text/plain", T)
+  @test occursin("│", s)
+  show_style(:table)
+
 
   T = tally([2, 1, 1, 1, 1, 2, 2, 3], equivalence = (x, y) -> x == y)
   s = sprint(show, "text/plain", T)
   @test occursin("[1]", s)
+  prison_count(T)
+  show_style(:prison)
+  s = sprint(show, "text/plain", T)
+  @test occursin("│", s)
+  show_style(:table)
 
   T = tally(Int[])
   @test sprint(show, "text/plain", T) isa String
   @test sprint(show, T) isa String
+  prison_count(T)
+  show_style(:prison)
+  s = sprint(show, "text/plain", T)
+  show_style(:table)
 
   T = tally(push!([1 for i in 1:100000], 2))
   s = sprint(show, "text/plain", T)
   @test occursin("1", s)
+  show_style(:prison)
+  s = sprint(show, "text/plain", T)
+  @test occursin("│", s)
+  show_style(:table)
 
   T = tally(append!([1 for i in 1:100000], [2 for i in 1:100001]))
   s = sprint(show, "text/plain", T)
   @test occursin("1", s)
+  show_style(:prison)
+  s = sprint(show, "text/plain", T)
+  @test occursin("│", s)
+  show_style(:table)
 
   # unicode plotting
 
@@ -146,6 +170,11 @@ Base.hash(::A) = rand(UInt)
     "     └                                        ┘       "
 
     @test string(Tally.plot(T)) == plot1
+    show_style(:plot)
+    s = sprint(show, "text/plain", T)
+    @test s == plot1
+    show_style(:table)
+
     @test string(Tally.plot(T, sortby = :value)) == plot1
     @test string(Tally.plot(T, sortby = :key)) == plot2
     @test string(Tally.plot(T, sortby = :key, reverse = true)) == plot1
