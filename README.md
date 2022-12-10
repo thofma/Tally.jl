@@ -10,6 +10,7 @@
 
 [![Build Status](https://github.com/thofma/Tally.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/thofma/Tally.jl/actions/workflows/CI.yml?query=branch%3Amaster)
 [![Coverage](https://codecov.io/gh/thofma/Tally.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/thofma/Tally.jl)
+[![Pkg Eval](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/T/Tally.svg)](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/report.html)
 
 Table of contents
 
