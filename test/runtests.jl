@@ -10,6 +10,8 @@ end
 
 using Plots
 
+using PrettyTables
+
 # type with bad hashing
 
 struct A
@@ -253,4 +255,8 @@ Base.hash(::A) = rand(UInt)
     @test_throws ErrorException T1 + T2
     @test_throws ErrorException T1 - T2
   end
+
+  # PrettyTables
+  T = tally(push!([1 for i in 1:100000], 2)) 
+  @test pretty_table(String, T) == "┌───────┬────────┐\n│  Keys │ Values │\n│ Int64 │  Int64 │\n├───────┼────────┤\n│     1 │ 100000 │\n│     2 │      1 │\n└───────┴────────┘\n"
 end

@@ -6,6 +6,8 @@ import UnicodePlots: barplot, label!
 
 export tally, lazy_tally, materialize, prison_count, show_style
 
+using Tables
+
 ################################################################################
 #
 #  Type
@@ -551,4 +553,27 @@ function animate(T::LazyTallyT; sortby = :value, percentage = true, reverse = fa
   return _dynamic_plot(T.it, T.by, T.equivalence, delay = delay, badges = badges, title = title)
 end
 
+################################################################################
+#
+#  Tables.jl interface
+#
+################################################################################
+
+struct DummyRow <: Tables.AbstractRow
+  k
+  v
 end
+
+Tables.istable(::Type{<:TallyT}) = true
+
+#Tables.rowaccess(::Type{<:TallyT}) = true
+#
+#Tables.rows(T::TallyT) = [Dict(v[1] => v[2]) for v in zip(keys(T), values(T))]
+
+Tables.columnaccess(::Type{<:TallyT}) = true
+
+Tables.columns(T::TallyT) = Tables.table(hcat(keys(T), values(T)); header = [:Keys, :Values])
+
+Tables.schema(T::TallyT{S}) where {S} = Tables.Schema(("Keys", "Values"), (S, Int))
+end
+
