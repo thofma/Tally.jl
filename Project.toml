@@ -1,7 +1,7 @@
 name = "Tally"
 uuid = "4a7475b6-8451-4f36-8c0c-176e4d128198"
 authors = ["Tommy Hofmann <thofma@gmail.com> and contributors"]
-version = "0.3.0"
+version = "0.4.0"
 
 [deps]
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
