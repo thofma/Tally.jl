@@ -28,7 +28,7 @@ Table of contents
 
 ## Installation
 
-Since Tally.jl is registered package, it can be installed simply as:
+Since Tally.jl is a registered package, it can be simply installed as follows:
 ```julia
 julia> using Pkg; Pkg.install("Tally")
 ```
