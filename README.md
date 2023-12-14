@@ -14,17 +14,17 @@
 
 Table of contents
 
-- [Installation](https://github.com/thofma/Tally.jl#installation)
-- [Usage](https://github.com/thofma/Tally.jl#usage)
-  - [Creating a tally (frequency count)](https://github.com/thofma/Tally.jl#creating-a-tally-frequency-count)
-  - [Plotting a tally](https://github.com/thofma/Tally.jl#plotting-a-tally)
-  - [Prison count](https://github.com/thofma/Tally.jl#prison-count)
-  - [Tables.jl interface and printing using PrettyTables.jl](https://github.com/thofma/Tally.jl/edit/master/README.md#tablesjl-interface-and-printing-using-prettytablejl)
-  - [Plotting using Plots.jl](https://github.com/thofma/Tally.jl#plotting-a-tally-using-plotsjl)
-- [Advanced usage](https://github.com/thofma/Tally.jl#advanced-usage)
-  - [Tally is too slow](https://github.com/thofma/Tally.jl#tally-is-too-slow)
-  - [Counting up to an equivalence](https://github.com/thofma/Tally.jl#counting-up-to-an-equivalence)
-  - [Lazy tallies and animations](https://github.com/thofma/Tally.jl#lazy-tallies-and-animations)
+- [Installation](#nstallation)
+- [Usage](#usage)
+  - [Creating a tally (frequency count)](#creating-a-tally-frequency-count)
+  - [Plotting a tally](#plotting-a-tally)
+  - [Prison count](#prison-count)
+  - [Tables.jl interface and printing using PrettyTables.jl](#tablesjl-interface-and-printing-using-prettytablejl)
+  - [Plotting using Plots.jl](#plotting-a-tally-using-plotsjl)
+- [Advanced usage](#advanced-usage)
+  - [Tally is too slow](#tally-is-too-slow)
+  - [Counting up to an equivalence](#counting-up-to-an-equivalence)
+  - [Lazy tallies and animations](#lazy-tallies-and-animations)
 
 ## Installation
 
